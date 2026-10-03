@@ -21,6 +21,8 @@ import sbol_utilities.sbol_diff
 # TODO: add to readme
 
 CREDENTIALS_FILE = Path(__file__).parent.parent / 'test_secret_idt_credentials.json'
+# The secret is unavailable to pull requests from forks, which leaves the credentials file empty
+HAS_CREDENTIALS = CREDENTIALS_FILE.exists() and CREDENTIALS_FILE.read_text().strip() != ''
 
 def same_except_timestamps(doc1: sbol3.Document, doc2: sbol3.Document) -> bool:
     """Check that the only triple-level difference between two SBOL documents is their time-stamps
@@ -39,7 +41,7 @@ def same_except_timestamps(doc1: sbol3.Document, doc2: sbol3.Document) -> bool:
                for (s1, p1, o1), (s2, p2, o2) in zip(sorted(first_graph), sorted(second_graph)))
 
 
-@unittest.skipUnless(CREDENTIALS_FILE.exists(), f'IDT credentials file {CREDENTIALS_FILE.name} not found')
+@unittest.skipUnless(HAS_CREDENTIALS, f'IDT credentials file {CREDENTIALS_FILE.name} missing or empty')
 class TestIDTCalculateComplexityScore(unittest.TestCase):
 
     def test_IDT_calculate_complexity_score(self):
